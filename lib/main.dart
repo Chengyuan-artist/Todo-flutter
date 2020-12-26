@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo/data/todo_database.dart';
 import 'package:todo/data/todo_model.dart';
 import 'package:todo/widgets/detail.dart';
 import 'package:todo/widgets/list.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  TodoDatabase().init();
   runApp(
     ChangeNotifierProvider(
       create: (context) => TodoModel(),

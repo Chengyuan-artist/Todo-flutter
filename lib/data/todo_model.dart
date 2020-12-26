@@ -5,13 +5,12 @@ import 'package:todo/data/todo_database.dart';
 class TodoModel extends ChangeNotifier {
   final db = TodoDatabase();
 
-  TodoModel(){
-    db.init();
-  }
 
   add(TodoItem item) async {
 
     await db.insertItem(item);
+
+    print('add item suc');
 
     notifyListeners();
   }
@@ -26,5 +25,13 @@ class TodoModel extends ChangeNotifier {
     await db.deleteItem(id);
 
     notifyListeners();
+  }
+
+  Future<List<TodoItem>> items() async {
+    return await db.todoItems();
+  }
+
+  getItem(int id) async {
+    return await db.getItem(id);
   }
 }

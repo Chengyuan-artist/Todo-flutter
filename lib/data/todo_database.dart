@@ -3,10 +3,10 @@ import 'package:sqflite/sqflite.dart';
 
 class TodoItem {
   final int id;
-  final String creatingTime;
-  final String updatingTime;
-  final String title;
-  final String content;
+  String creatingTime;
+  String updatingTime;
+  String title;
+  String content;
   TodoItem(
       {this.id,
       this.creatingTime,
@@ -64,9 +64,10 @@ class TodoDatabase {
       item.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    print('db insert suc');
   }
 
-  todoItems() async {
+  Future<List<TodoItem>> todoItems() async {
     final Database db = await database;
 
     final maps = await db.query('todos');
@@ -101,5 +102,28 @@ class TodoDatabase {
       where: "id = ?",
       whereArgs: [id],
     );
+  }
+
+  Future<TodoItem> getItem(int id) async {
+    final Database db = await database;
+
+    final map = await db.query(
+      'todos',
+      where: "id = ?",
+      whereArgs: [id],
+    );
+
+    //数据库中不含此id
+    if(map.length == 0)return null;
+
+    final item = TodoItem(
+      id: map[0]['id'],
+      title: map[0]['title'],
+      content: map[0]['content'],
+      creatingTime: map[0]['creatingTime'],
+      updatingTime: map[0]['updatingTime'],
+    );
+
+    return item;
   }
 }
