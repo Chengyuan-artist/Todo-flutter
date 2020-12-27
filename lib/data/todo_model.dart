@@ -28,10 +28,14 @@ class TodoModel extends ChangeNotifier {
   }
 
   Future<List<TodoItem>> items() async {
-    return await db.todoItems();
+    List<TodoItem> items = await db.todoItems();
+    notifyListeners();
+    return items;
   }
 
-  getItem(int id) async {
-    return await db.getItem(id);
+  Future<TodoItem> getItem(int id) async {
+    TodoItem item = await db.getItem(id);
+    // notifyListeners();
+    return item;
   }
 }

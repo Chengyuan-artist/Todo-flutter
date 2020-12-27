@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:todo/data/todo_database.dart';
 import 'package:todo/data/todo_model.dart';
@@ -12,19 +11,22 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
+  List<TodoItem> _items;
   @override
   Widget build(BuildContext context) {
     // dbTest();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('ListPage'),
       ),
       body: Consumer<TodoModel>(builder: (context, model, child) {
-        List<TodoItem> _items;
+        ///working around 系统会自动反复“刷新”，访问数据库
+        /// ？存疑 行为到底是什么
         model.items().then((value) {
           _items = value;
         });
-
+        // 如果数据库中没有数据
         if (_items == null) {
           return Center(
             child: Column(
@@ -38,10 +40,11 @@ class _ListPageState extends State<ListPage> {
           );
         }
 
-        final Iterable<ListTile> tiles = _items?.map((item) {
+        final Iterable<ListTile> tiles = _items.map((item) {
           if (item == null) return null;
           return ListTile(
             title: Text(item.title),
+            onTap: () => _navigateToDetail(item.id),
           );
         });
 
@@ -62,8 +65,8 @@ class _ListPageState extends State<ListPage> {
     );
   }
 
-  dbTest() {
-    var db = TodoDatabase();
-    db.init();
+  _navigateToDetail(int id){
+      print('ontap : $id');
+      Navigator.pushNamed(context, DetailPage.routeName, arguments: id);
   }
 }
