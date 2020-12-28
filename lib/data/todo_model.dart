@@ -39,6 +39,8 @@ class TodoModel extends ChangeNotifier {
     /// 根据index排序
     _items.sort((a, b) => a.itemIndex.compareTo(b.itemIndex));
 
+    _updateIndex(0);
+
     notifyListeners();
   }
 
