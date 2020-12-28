@@ -7,13 +7,12 @@ import 'package:todo/widgets/list.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  TodoDatabase().init();
+  // TodoDatabase().init();
   runApp(
     ChangeNotifierProvider(
-      create: (context) => TodoModel(),
-      child: MyApp(),
-    )
-  );
+    create: (context) => TodoModel(),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

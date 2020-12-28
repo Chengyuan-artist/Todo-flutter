@@ -11,23 +11,17 @@ class ListPage extends StatefulWidget {
 }
 
 class _ListPageState extends State<ListPage> {
-  List<TodoItem> _items;
   @override
   Widget build(BuildContext context) {
-    // dbTest();
-
     return Scaffold(
       appBar: AppBar(
         title: Text('ListPage'),
       ),
       body: Consumer<TodoModel>(builder: (context, model, child) {
-        ///working around 系统会自动反复“刷新”，访问数据库
-        /// ？存疑 行为到底是什么
-        model.items().then((value) {
-          _items = value;
-        });
+        List<TodoItem> _items = model.getAll();
+
         // 如果数据库中没有数据
-        if (_items == null) {
+        if (_items == null || _items.length == 0) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -40,22 +34,28 @@ class _ListPageState extends State<ListPage> {
           );
         }
 
-        final Iterable<ListTile> tiles = _items.map((item) {
-          if (item == null) return null;
-          return ListTile(
-            title: Text(item.title),
-            onTap: () => _navigateToDetail(item.id),
-          );
+        final Iterable<Dismissible> tiles = _items.map((item) {
+          return Dismissible(
+              background: Container(
+                color: Colors.red,
+              ),
+              key: Key(item.id.toString()),
+              onDismissed: (direction) {
+                model.deleteItem(item.id);
+                Scaffold.of(context)
+                    .showSnackBar(SnackBar(content: Text("item dismissed")));
+              },
+              child: ListTile(
+                key: Key(item.id.toString()),
+                title: Text(item.title),
+                onTap: () => _navigateToDetail(item.id),
+              ));
         });
 
-        final List<Widget> divided = ListTile.divideTiles(
-          context: context,
-          tiles: tiles,
-        ).toList();
-
-        return ListView(
-          children: divided,
-        );
+        return ReorderableListView(
+            children: tiles.toList(),
+            onReorder: (int oldIndex, int newIndex) =>
+                model.reoderItem(oldIndex, newIndex));
       }),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.pushNamed(context, DetailPage.routeName),
@@ -65,8 +65,8 @@ class _ListPageState extends State<ListPage> {
     );
   }
 
-  _navigateToDetail(int id){
-      print('ontap : $id');
-      Navigator.pushNamed(context, DetailPage.routeName, arguments: id);
+  _navigateToDetail(int id) {
+    print('ontap : $id');
+    Navigator.pushNamed(context, DetailPage.routeName, arguments: id);
   }
 }

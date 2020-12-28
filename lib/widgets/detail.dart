@@ -10,7 +10,6 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  TodoItem _item;
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +17,7 @@ class _DetailPageState extends State<DetailPage> {
     final int id = ModalRoute.of(context).settings.arguments;
     print("get the id $id");
 
-    String title = '';
-    String content = '';
+    TodoItem _item = Provider.of<TodoModel>(context, listen: false).getItem(id)?? TodoItem();
 
     return Scaffold(
       appBar: AppBar(
@@ -28,17 +26,10 @@ class _DetailPageState extends State<DetailPage> {
           new IconButton(
               icon: const Icon(Icons.check_outlined),
               onPressed: () {
-                TodoItem newItem = TodoItem(
-                  id: id,
-                  title: title,
-                  content: content,
-                );
                 if (id == null)
-                  Provider.of<TodoModel>(context, listen: false).add(newItem);
+                  Provider.of<TodoModel>(context, listen: false).addItem(_item);
                 else
-                  Provider.of<TodoModel>(context, listen: false)
-                      .update(newItem);
-
+                  Provider.of<TodoModel>(context, listen: false).updateItem(_item);
                 Navigator.pop(context);
                 print('pop suc!');
               })
@@ -48,9 +39,7 @@ class _DetailPageState extends State<DetailPage> {
           padding: const EdgeInsets.all(20.0),
           child: Consumer<TodoModel>(
             builder: (context, model, child) {
-              model.getItem(id).then((value) => _item = value);
-              title = _item?.title;
-              content = _item?.content;
+              
               return Column(
                 children: <Widget>[
                   Text(
@@ -62,14 +51,14 @@ class _DetailPageState extends State<DetailPage> {
                     ),
                     maxLength: 15,
                     initialValue: _item.title,
-                    onChanged: (text) => title = text,
+                    onChanged: (text) => _item.title = text,
                   ),
                   TextFormField(
                     decoration: InputDecoration(hintText: 'Enter the content'),
                     maxLines: 12,
                     maxLength: 1037,
                     initialValue: _item.content,
-                    onChanged: (text) => content = text,
+                    onChanged: (text) => _item.content = text,
                   ),
                 ],
               );

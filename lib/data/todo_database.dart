@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -7,12 +9,14 @@ class TodoItem {
   String updatingTime;
   String title;
   String content;
+  int itemIndex;
   TodoItem(
       {this.id,
       this.creatingTime,
       this.updatingTime,
       this.title,
-      this.content});
+      this.content,
+      this.itemIndex});
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -20,6 +24,7 @@ class TodoItem {
       'content': content,
       'creatingTime': creatingTime,
       'updatingTime': updatingTime,
+      'itemIndex': itemIndex,
     };
   }
 }
@@ -43,13 +48,13 @@ class TodoDatabase {
     print("Todo db initialized");
   }
 
-  init() async {
+  Future init() async {
     String path = await getDatabasesPath();
     database = openDatabase(
       join(path, 'todo_database.db'),
       onCreate: (db, version) {
         return db.execute(
-          "CREATE TABLE todos(id INTEGER PRIMARY KEY, title TEXT, content TEXT, creatingTime TEXT, updatingTime TEXT)",
+          "CREATE TABLE todos(id INTEGER PRIMARY KEY, title TEXT, content TEXT, creatingTime TEXT, updatingTime TEXT, itemIndex INTEGER)",
         );
       },
       version: 1,
@@ -80,13 +85,14 @@ class TodoDatabase {
               content: maps[i]['content'],
               creatingTime: maps[i]['creatingTime'],
               updatingTime: maps[i]['updatingTime'],
+              itemIndex: maps[i]['itemIndex'],
             ));
   }
 
-  updateItem(TodoItem item) async {
+  Future<int> updateItem(TodoItem item) async {
     final Database db = await database;
 
-    await db.update(
+    return await db.update(
       'todos',
       item.toMap(),
       where: "id = ?",
@@ -114,7 +120,7 @@ class TodoDatabase {
     );
 
     //数据库中不含此id
-    if(map.length == 0)return null;
+    if (map.length == 0) return null;
 
     final item = TodoItem(
       id: map[0]['id'],
@@ -122,6 +128,7 @@ class TodoDatabase {
       content: map[0]['content'],
       creatingTime: map[0]['creatingTime'],
       updatingTime: map[0]['updatingTime'],
+      itemIndex: map[0]['itemIndex'],
     );
 
     return item;
