@@ -39,8 +39,6 @@ class TodoModel extends ChangeNotifier {
     /// 根据index排序
     _items.sort((a, b) => a.itemIndex.compareTo(b.itemIndex));
 
-    _updateIndex(0);
-
     notifyListeners();
   }
 
@@ -92,6 +90,8 @@ class TodoModel extends ChangeNotifier {
   void deleteItem(int id) {
     int index = _idMap[id].itemIndex;
     _items.removeAt(index);
+
+    _updateIndex(0);
 
     notifyListeners();
     db.deleteItem(id);

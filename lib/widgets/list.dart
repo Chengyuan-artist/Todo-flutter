@@ -43,11 +43,11 @@ class _ListPageState extends State<ListPage> {
               onDismissed: (direction) {
                 model.deleteItem(item.id);
                 Scaffold.of(context)
-                    .showSnackBar(SnackBar(content: Text("item dismissed")));
+                    .showSnackBar(SnackBar(content: Text("item ${item.id} dismissed")));
               },
               child: ListTile(
                 key: Key(item.id.toString()),
-                title: Text(item.title),
+                title: Text(item.title?? ''),
                 onTap: () => _navigateToDetail(item.id),
               ));
         });
